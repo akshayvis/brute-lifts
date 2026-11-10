@@ -1,0 +1,22 @@
+name: Import source bundle
+on:
+  push:
+permissions:
+  contents: write
+jobs:
+  import:
+    if: github.actor == 'akshayvis'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import bundled source
+        run: |
+          mkdir -p /tmp/source
+          unzip -q source_bundle.zip -d /tmp/source
+          rsync -a --delete --exclude=.git /tmp/source/ .
+          rm source_bundle.zip
+          git config user.name 'Akshay Viswanathan'
+          git config user.email 'akshaybviswanathan@gmail.com'
+          git add -A
+          git diff --cached --quiet || git commit -m 'Import training journal source'
+          git push
