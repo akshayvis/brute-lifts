@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {initialState,makeSession,makeItem,suggestion,finish,proposals,templates,byId} from '../app/model.ts';
+let s=initialState();assert.equal(s.next,3);assert.equal(s.events[0].date,'2026-11-08');assert.equal(s.events[0].kind,'skip');assert.equal(s.events.filter(e=>e.kind==='workout').length,0);
+for(const t of templates)assert.equal(t.length,6);
+assert.equal(templates[3][2],'truehip');assert.equal(byId.truehip.name,'TRUE Hip Thruster');
+assert.equal(makeItem(s,'bench').sets[0].reps,'10');
+assert.equal(makeSession(s,'2026-11-09').cardio.skipped,false);
+for(const id of ['squat','lateral','horizontalcalf'])assert.equal(suggestion(s,id),null);
+s.draft=makeSession(s,'2026-11-09');assert.throws(()=>finish(s));assert.equal(s.draft.items[0].id,'squat');
+s.draft.items[0].sets=[{weight:'90',reps:'12',done:true},{weight:'90',reps:'12',done:true},{weight:'90',reps:'12',done:true}];s.draft.items[0].difficulty='Easy';s=finish(s);assert.equal(s.next,0);assert.equal(s.draft,null);assert.equal(suggestion(s,'squat'),90);assert.equal(proposals(s).find(p=>p.id==='squat').to,95);
+s.approved.squat=95;assert.equal(suggestion(s,'squat'),95);assert.equal(suggestion(s,'pendulum'),null);assert.equal(proposals(s).length,0);
+let swapped=makeItem(s,'pendulum','squat');assert.equal(swapped.base,'squat');assert.equal(swapped.sets[0].weight,'');assert.equal(templates[3][0],'squat');
+s.next=3;s.draft=makeSession(s,'2026-11-11');s.draft.items[0].sets[0]={weight:'95',reps:'8',done:true};s=finish(s);assert.equal(s.approved.squat,undefined);assert.equal(suggestion(s,'squat'),95);assert.equal(proposals(s).length,0);
+assert.equal(byId.row.unit,'stack');assert.equal(byId.legpress.unit,'stack');console.log('PASS: initial skip, empty history, six exercises, unset weights, rotation, actual-based suggestions, approval, separate substitutions.');
