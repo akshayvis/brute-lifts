@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-export const metadata: Metadata = { title: 'Training Journal', description: 'Your next workout. Your own pace.', icons: { icon: '/favicon.svg' } };
+
+export const metadata: Metadata = { title: 'Brute Lifts', description: 'Your next workout. Your own pace.', icons: { icon: '/favicon.svg' } };
+
 export default function RootLayout({children}: {children: React.ReactNode}) { return <html lang="en"><body>{children}</body></html>; }
