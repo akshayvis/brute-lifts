@@ -1,4 +1,4 @@
-# FORM — Training Journal
+# Brute Lifts
 
 Private, responsive workout tracker built with React, Vinext and Cloudflare D1 via Sites.
 
