@@ -14,7 +14,7 @@ jobs:
           mkdir -p /tmp/source
           unzip -q source_bundle.zip -d /tmp/source
           rsync -a --delete --exclude=.git /tmp/source/ .
-          rm source_bundle.zip
+          rm -f source_bundle.zip
           git config user.name 'Akshay Viswanathan'
           git config user.email 'akshaybviswanathan@gmail.com'
           git add -A
