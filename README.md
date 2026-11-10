@@ -2,6 +2,8 @@
 
 Private, responsive workout tracker built with React, Vinext and Cloudflare D1 via Sites.
 
+**[Open Brute Lifts](https://brute-lifts.beamingchasm.chatgpt.site)**
+
 ## Features
 - Four-session round-robin, starting at Lower B; skips hold the rotation.
 - Six strength exercises per session with muscle targets, form cues, pounds and per-set actuals.
