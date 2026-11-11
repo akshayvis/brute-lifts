@@ -12,7 +12,7 @@ Private, responsive workout tracker built with React, Vinext and Cloudflare D1 v
 - Temporary substitutions restricted to the confirmed equipment catalog; independent exercise histories.
 - Elliptical / treadmill prescription and actuals.
 - Persistent draft workouts, editable completed actuals, exportable JSON, exercise and cardio charts.
-- Optional Easy / Moderate /Hard feedback. Three equal-load sets at the upper rep target rated Easy propose a 5 lb increase, editable before approval. No automatic increases.
+- Optional Easy / Moderate / Hard feedback. Three equal-load sets at the upper rep target rated Easy propose a 5 lb increase, editable before approval. No automatic increases.
 - User-scoped database records with optimistic revision checks, explicit Save and unsaved-change warnings.
 
 ## Development
