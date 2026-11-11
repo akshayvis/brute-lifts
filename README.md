@@ -7,6 +7,8 @@ Private, responsive workout tracker built with React, Vinext and Cloudflare D1 v
 ## Features
 - Four-session round-robin, starting at Lower B; skips hold the rotation.
 - Six strength exercises per session with muscle targets, form cues, pounds and per-set actuals.
+- Add an extra working or reduced-weight back-off set whenever needed.
+- Barbell and dumbbell bench press alternate on Upper A sessions.
 - Temporary substitutions restricted to the confirmed equipment catalog; independent exercise histories.
 - Elliptical / treadmill prescription and actuals.
 - Persistent draft workouts, editable completed actuals, exportable JSON, exercise and cardio charts.
