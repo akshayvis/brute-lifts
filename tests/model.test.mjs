@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {initialState,makeSession,makeItem,suggestion,finish,proposals,templates,byId} from '../app/model.ts';
+import {initialState,makeSession,makeItem,suggestion,finish,proposals,templates,byId,nextBenchId,upcomingDays} from '../app/model.ts';
 let s=initialState();assert.equal(s.next,3);assert.equal(s.events[0].date,'2026-11-08');assert.equal(s.events[0].kind,'skip');assert.equal(s.events.filter(e=>e.kind==='workout').length,0);
 for(const t of templates)assert.equal(t.length,6);
 assert.equal(templates[3][2],'truehip');assert.equal(byId.truehip.name,'TRUE Hip Thruster');
@@ -12,3 +12,6 @@ s.approved.squat=95;assert.equal(suggestion(s,'squat'),95);assert.equal(suggesti
 let swapped=makeItem(s,'pendulum','squat');assert.equal(swapped.base,'squat');assert.equal(swapped.sets[0].weight,'');assert.equal(templates[3][0],'squat');
 s.next=3;s.draft=makeSession(s,'2026-11-11');s.draft.items[0].sets[0]={weight:'95',reps:'8',done:true};s=finish(s);assert.equal(s.approved.squat,undefined);assert.equal(suggestion(s,'squat'),95);assert.equal(proposals(s).length,0);
 assert.equal(byId.row.unit,'stack');assert.equal(byId.legpress.unit,'stack');console.log('PASS: initial skip, empty history, six exercises, unset weights, rotation, actual-based suggestions, approval, separate substitutions.');
+assert.equal(byId.standingcalf.name,'Standing calf raise');assert.equal(byId.standingcalf.weight,135);assert.equal(byId.standingcalf.group,'calf');
+assert.deepEqual(upcomingDays(0,'workout',5),[{kind:'workout',index:0},{kind:'recovery'},{kind:'workout',index:1},{kind:'rest'},{kind:'workout',index:2}]);
+let benchState=initialState();benchState.events.push({id:'barbell',date:'2026-11-10',kind:'workout',index:0,items:[{...makeItem(benchState,'bench'),sets:[{weight:'95',reps:'10',done:true},{weight:'95',reps:'10',done:true},{weight:'95',reps:'10',done:true}]}],note:'',cardio:{type:'Elliptical',minutes:'',level:'',rpm:'',speed:'',incline:'',done:false,skipped:false}});assert.equal(nextBenchId(benchState),'dumbbellbench');benchState.events.push({id:'dumbbell',date:'2026-11-18',kind:'workout',index:0,items:[{...makeItem(benchState,'dumbbellbench','bench'),sets:[{weight:'30',reps:'10',done:true},{weight:'30',reps:'10',done:true},{weight:'30',reps:'10',done:true}]}],note:'',cardio:{type:'Elliptical',minutes:'',level:'',rpm:'',speed:'',incline:'',done:false,skipped:false}});assert.equal(nextBenchId(benchState),'bench');

@@ -26,20 +26,26 @@ ex('hip','Booty Builder hip thrust','Glutes',[10,12],25,'added per side','glutes
 ex('truehip','TRUE Hip Thruster','Glutes',[10,12],null,'displayed load','glutes','Set the pad comfortably across your hips and keep your ribs down. Drive through your feet, pause with glutes squeezed, and do not finish by arching your lower back.'),
 ex('glute','TRUE glute press','Glutes',[10,12],30,'displayed load · each leg','glutes','Keep your pelvis square and torso supported. Press through a controlled range without twisting your lower back.'),
 ex('horizontalcalf','Horizontal calf raise','Calves',[12,15],null,'displayed load','calf','Keep forefeet secure on the platform. Move through a comfortable ankle range and pause rather than bouncing.'),
+ex('standingcalf','Standing calf raise','Calves · gastrocnemius emphasis',[12,15],135,'displayed load','calf','Keep knees softly straight and use a controlled stretch at the bottom. Rise through the balls of your feet, pause at the top, and avoid bouncing.'),
 ex('pendulum','TRUE pendulum squat','Quads · glutes',[8,12],null,'machine load · use a consistent convention','squat','Set the stops and keep your back against the pad. Track knees with toes; use a controlled depth you can reverse smoothly.'),
 ex('truerow','TRUE Palladium seated row','Mid-back · rear shoulders',[8,12],null,'stack','row','Adjust the seat so handles align comfortably with your torso. Keep your chest supported and avoid shrugging.')];
 export const byId=Object.fromEntries(exercises.map(e=>[e.id,e]));
 export const rotation=['Upper A','Lower A','Upper B','Lower B'];
 export const templates=[['bench','lat','row','bayesian','pushdown','lateral'],['legpress','seatedcurl','extension','back','rotary','abs'],['incline','row','front','preacher','hammer','overhead'],['squat','horizontalcurl','truehip','glute','horizontalcalf','abs']];
+export type ScheduleDay={kind:'workout'|'recovery'|'rest';index?:number};
+export const postWorkoutDay=(index:number):'recovery'|'rest'=>index%2===0?'recovery':'rest';
+export function upcomingDays(next:number,first:'workout'|'recovery'|'rest',count=7):ScheduleDay[]{let index=next,kind=first;return Array.from({length:count},()=>{if(kind==='workout'){const day:ScheduleDay={kind,index};index=(index+1)%rotation.length;kind=postWorkoutDay(day.index!);return day;}const day:ScheduleDay={kind};kind='workout';return day;});}
 export type SetLog={weight:string;reps:string;done:boolean};
-export type Item={base:string;id:string;sets:SetLog[];difficulty:string};
+export type CustomExercise={name:string;preference:'suggest'|'avoid'};
+export type Item={base:string;id:string;sets:SetLog[];difficulty:string;custom?:CustomExercise};
 export type Session={id:string;date:string;kind:'workout'|'skip';index:number;items:Item[];note:string;cardio:{type:string;minutes:string;level:string;rpm:string;speed:string;incline:string;done:boolean;skipped:boolean}};
 export type State={next:number;events:Session[];draft:Session|null;approved:Record<string,number>};
 export const emptyCardio=()=>({type:'Elliptical',minutes:'25',level:'6',rpm:'50–55',speed:'',incline:'',done:false,skipped:false});
 export function initialState():State{return {next:3,events:[{id:'initial-skip',date:'2026-11-08',kind:'skip',index:3,items:[],note:'Skipped; Lower B moved to next visit.',cardio:{...emptyCardio(),minutes:''}}],draft:null,approved:{}}}
 export function latest(state:State,id:string){return [...state.events].reverse().filter(s=>s.kind==='workout').flatMap(s=>s.items).find(i=>i.id===id&&i.sets.some(s=>s.done));}
 export function suggestion(state:State,id:string){if(state.approved[id]!==undefined)return state.approved[id]; const last=latest(state,id);return last?Number(last.sets.filter(s=>s.done).at(-1)!.weight):byId[id].weight;}
-export function makeItem(state:State,id:string,base=id):Item {const e=byId[id],w=suggestion(state,id);return {base,id,sets:Array.from({length:3},()=>({weight:w===null?'':String(w),reps:'10',done:false})),difficulty:''};}
+export function makeItem(state:State,id:string,base=id):Item {const w=suggestion(state,id);return {base,id,sets:Array.from({length:3},()=>({weight:w===null?'':String(w),reps:'10',done:false})),difficulty:''};}
+export function makeCustomItem(base:string):Item {return {base,id:'custom',custom:{name:'',preference:'suggest'},sets:Array.from({length:3},()=>({weight:'',reps:'10',done:false})),difficulty:''};}
 export function nextBenchId(state:State){const last=[...state.events].reverse().filter(s=>s.kind==='workout').flatMap(s=>[...s.items].reverse()).find(i=>i.base==='bench'&&(i.id==='bench'||i.id==='dumbbellbench')&&i.sets.some(set=>set.done));return last?.id==='bench'?'dumbbellbench':'bench';}
 export function makeSession(state:State,date:string):Session {return {id:newId(),date,kind:'workout',index:state.next,items:templates[state.next].map(id=>makeItem(state,id==='bench'?nextBenchId(state):id)),note:'',cardio:emptyCardio()};}
 export function proposals(state:State){return exercises.flatMap(e=>{const last=latest(state,e.id);if(!last||last.difficulty!=='Easy'||last.sets.filter(s=>s.done).length<3)return [];const sets=last.sets.filter(s=>s.done);const w=Number(sets[0].weight);if(!sets.every(s=>Number(s.reps)>=e.reps[1]&&Number(s.weight)===w)||state.approved[e.id]!==undefined)return [];return [{id:e.id,from:w,to:w+5}];});}
